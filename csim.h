@@ -6,13 +6,19 @@
 
 typedef struct {
   bool valid;                // valid bit 
-  unsigned long long tag;     // tag size = 64-(s+b)
-  char *block;                // array of bytes
+  unsigned long tag;     // tag size = t
+  int access_time;
+
 } Cacheline;
 
 typedef struct {
     Cacheline **table;   // array of caccheline ptr
+    int s, E, b, t;
+    long S, B;
+    int time;
+
 }Cache;
 
 Cache *cache_create(int s, int E, int b);
+void cache_visit(Cache *cache, unsigned long addr);
 #endif
