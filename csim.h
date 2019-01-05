@@ -6,8 +6,8 @@
 
 typedef struct {
   bool valid;                // valid bit 
-  usigned long long tag;     // tag size = 64-(s+b)
-  char *block                // array of bytes
+  unsigned long long tag;     // tag size = 64-(s+b)
+  char *block;                // array of bytes
 } Cacherow;
 
 typedef struct {
@@ -18,4 +18,5 @@ typedef struct {
     Set *sets;   // array of Set
 }Cache;
 
-Cache cache_create(int s, int E, int b);
+Cache *cache_create(int s, int E, int b);
+#endif
