@@ -3,19 +3,19 @@
 
 #include <stdlib.h>
 
-Cache cache_create(int s, int E, int b){
-    Cache cache;
+Cache *cache_create(int s, int E, int b){
+    Cache *cache = (Cache *)malloc(sizeof(Cache));
     
     long S = 2 << s;
     long B = 2 << b;
 
-    cache.sets = (Set *)calloc(S, sizeof(Set));
+    cache->table = (Cacheline **)calloc(S, sizeof(Cacheline *));
     
     for(long i = 0; i < S; i++){
-        cache.sets[i].cacherow = (Cacherow *)calloc(E, sizeof(Cacherow));
-        for(long j = 0; j < B; i++){
-            cache.sets[i].cacherow[j].block = (char *)calloc(B, sizeof(char));
-            cache.sets[i].cacherow[j].valid = 0;
+        cache->table[i] = (Cacheline *)calloc(E, sizeof(Cacheline));
+        for(long j = 0; j < B; j++){
+            cache->table[i][j].block = (char *)calloc(B, sizeof(char));
+            cache->table[i][j].valid = 0;
             /// todo: add tag size
         }
     }
