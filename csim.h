@@ -18,5 +18,5 @@ typedef struct {
     Set *sets;   // array of Set
 }Cache;
 
-Cache *cache_create(int s, int E, int b);
+Cache cache_create(int s, int E, int b);
 #endif
