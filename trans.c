@@ -22,6 +22,109 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N]);
 char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 {
+    // cache: 8 int per block
+    // read and write 8 int per row in A
+    if (M == 32){
+        int a1, a2, a3, a4, a5, a6, a7, a8;
+        int i, j;
+        for (i = 0; i < N; i+=8) {
+            for (j = 0; j < M; j++) {
+                a1 = A[j][i];  
+                a2 = A[j][i+1];
+                a3 = A[j][i+2];
+                a4 = A[j][i+3];
+                a5 = A[j][i+4];
+                a6 = A[j][i+5];
+                a7 = A[j][i+6];
+                a8 = A[j][i+7];
+
+                B[i  ][j] = a1;  
+                B[i+1][j] = a2;
+                B[i+2][j] = a3;
+                B[i+3][j] = a4;
+                B[i+4][j] = a5;
+                B[i+5][j] = a6;
+                B[i+6][j] = a7;
+                B[i+7][j] = a8;
+
+            }
+        }    
+
+        return;
+    }
+
+    else if (M == 64){
+        int a1, a2, a3, a4, a5, a6, a7, a8;
+        int i, j, k;
+        for(i=0;i<64;i+=8){
+            for(j=0;j<64;j+=8){
+                for(k=j;k<j+4;k++){
+                    a1=A[k][i];
+                    a2=A[k][i+1];
+                    a3=A[k][i+2];
+                    a4=A[k][i+3];
+                    a5=A[k][i+4];
+                    a6=A[k][i+5];
+                    a7=A[k][i+6];
+                    a8=A[k][i+7];
+   
+                    B[i][k]=a1;
+                    B[i+1][k]=a2;
+                    B[i+2][k]=a3;
+                    B[i+3][k]=a4;
+                    B[i][k+4]=a5;
+                    B[i+1][k+4]=a6;
+                    B[i+2][k+4]=a7;
+                    B[i+3][k+4]=a8;                               
+                }
+                for(k=i;k<i+4;k++){
+                    a1=B[k][j+4];
+                    a2=B[k][j+5];
+                    a3=B[k][j+6];
+                    a4=B[k][j+7];
+                    a5=A[j+4][k];
+                    a6=A[j+5][k];
+                    a7=A[j+6][k];
+                    a8=A[j+7][k];
+   
+                    B[k][j+4]=a5;
+                    B[k][j+5]=a6;
+                    B[k][j+6]=a7;
+                    B[k][j+7]=a8;
+                    B[k+4][j]=a1;
+                    B[k+4][j+1]=a2;
+                    B[k+4][j+2]=a3;
+                    B[k+4][j+3]=a4;
+                }
+                for(k=i+4;k<i+8;k++){
+                    a1=A[j+4][k];
+                    a2=A[j+5][k];
+                    a3=A[j+6][k];
+                    a4=A[j+7][k];
+
+                    B[k][j+4]=a1;
+                    B[k][j+5]=a2;
+                    B[k][j+6]=a3;
+                    B[k][j+7]=a4;
+                }
+            }
+        }
+
+        return;
+    }    
+
+    int i, j, m, n;
+
+    int block = 16;
+    for (i = 0; i < N; i+=block) {
+        for (j = 0; j < M; j+=block) {
+            for (m = i; m < i+block && m < N; m++) {
+                for (n = j;n< j+block && n < M; n++) {
+                    B[n][m] = A[m][n];
+                }
+            }    
+        }
+    }    
 }
 
 /* 
